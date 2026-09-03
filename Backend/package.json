@@ -1,0 +1,23 @@
+{
+  "name": "prem-a-to-z",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/ankitkryadav972-web/PREM_A_TO_Z_INTERIOR#readme",
+  "bugs": {
+    "url": "https://github.com/ankitkryadav972-web/PREM_A_TO_Z_INTERIOR/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ankitkryadav972-web/PREM_A_TO_Z_INTERIOR.git"
+  },
+  "license": "ISC",
+  "author": "Ankit Kumar Yadav",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
