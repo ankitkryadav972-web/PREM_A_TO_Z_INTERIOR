@@ -12,13 +12,20 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 pb-16 border-b border-white/5">
           {/* Brand Info */}
           <div className="lg:col-span-4 flex flex-col">
-            <Link to="/" className="inline-block mb-4 focus:outline-none">
-              <span className="font-editorial text-2xl font-bold tracking-wider text-white">
-                PREM A TO Z
-              </span>
-              <span className="block text-[10px] uppercase tracking-[0.3em] text-[#c5a880] -mt-1 font-medium">
-                Interior Design
-              </span>
+            <Link to="/" className="inline-flex items-center gap-3.5 mb-5 focus:outline-none group">
+              <img
+                src="/logo.jpeg"
+                alt="Prem A to Z Logo"
+                className="w-12 h-12 rounded-full object-cover border border-[#c5a880]/40 group-hover:border-[#c5a880] transition-colors duration-300 shadow-lg shrink-0"
+              />
+              <div className="flex flex-col">
+                <span className="font-editorial text-2xl font-bold tracking-wider text-white group-hover:text-[#c5a880] transition-colors">
+                  PREM A TO Z
+                </span>
+                <span className="block text-[10px] uppercase tracking-[0.3em] text-[#c5a880] -mt-1 font-medium">
+                  Interior Design
+                </span>
+              </div>
             </Link>
 
             <p className="text-sm leading-relaxed text-stone-400 max-w-sm mb-6 font-light">

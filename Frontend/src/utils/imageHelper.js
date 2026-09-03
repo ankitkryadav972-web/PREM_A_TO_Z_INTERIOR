@@ -43,7 +43,9 @@ export const resolveImageUrl = (imageUrl, fallbackKey = 'kitchen') => {
 
   // If it's a real upload from backend
   if (imageUrl.startsWith('/uploads/')) {
-    return `http://localhost:5000${imageUrl}`;
+    const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+    const serverOrigin = apiBase.replace(/\/api\/?$/, '');
+    return `${serverOrigin}${imageUrl}`;
   }
 
   return imageUrl;

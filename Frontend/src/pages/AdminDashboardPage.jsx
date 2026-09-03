@@ -161,13 +161,20 @@ export const AdminDashboardPage = () => {
           {/* Sidebar */}
           <div className="lg:col-span-3 bg-[#141417] border border-white/10 p-5 flex flex-col justify-between h-fit">
             <div>
-              <div className="pb-4 mb-4 border-b border-white/10">
-                <span className="font-editorial text-xl font-normal text-white block">
-                  {businessInfo.name}
-                </span>
-                <span className="text-[10px] uppercase tracking-[0.25em] text-[#c5a880] font-medium">
-                  Administrator Console
-                </span>
+              <div className="pb-4 mb-4 border-b border-white/10 flex items-center gap-3">
+                <img
+                  src="/logo.jpeg"
+                  alt="Prem A to Z Logo"
+                  className="w-10 h-10 rounded-full object-cover border border-[#c5a880]/40 shrink-0"
+                />
+                <div>
+                  <span className="font-editorial text-lg font-normal text-white block leading-tight">
+                    {businessInfo.name}
+                  </span>
+                  <span className="text-[9px] uppercase tracking-[0.25em] text-[#c5a880] font-medium block">
+                    Administrator Console
+                  </span>
+                </div>
               </div>
 
               <nav className="space-y-1">
