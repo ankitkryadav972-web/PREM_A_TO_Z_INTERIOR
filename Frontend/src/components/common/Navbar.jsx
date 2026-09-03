@@ -50,21 +50,13 @@ export const Navbar = () => {
     >
       <Container size="lg">
         <div className="flex items-center justify-between">
-          {/* Brand Logo */}
-          <Link to="/" className="group flex items-center gap-3 focus:outline-none">
+          {/* Brand Logo - Rectangular Image Only */}
+          <Link to="/" className="group focus:outline-none flex items-center py-1">
             <img
               src="/logo.jpeg"
-              alt="Prem A to Z Logo"
-              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover border border-[#c5a880]/40 group-hover:border-[#c5a880] group-hover:scale-105 transition-all duration-300 shadow-md shadow-black/50 shrink-0"
+              alt="PREM A TO Z INTERIOR DESIGN"
+              className="h-10 sm:h-12 w-auto max-w-[180px] sm:max-w-[240px] object-contain rounded-sm transition-transform duration-300 group-hover:scale-105"
             />
-            <div className="flex flex-col">
-              <span className="font-editorial text-xl sm:text-2xl font-semibold tracking-wider text-white group-hover:text-[#c5a880] transition-colors duration-300">
-                PREM A TO Z
-              </span>
-              <span className="text-[9px] uppercase tracking-[0.3em] text-[#c5a880] -mt-1 font-medium">
-                Interior Design
-              </span>
-            </div>
           </Link>
 
           {/* Desktop Navigation Links */}
