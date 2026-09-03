@@ -1,1 +1,71 @@
 @import "tailwindcss";
+
+@theme {
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  
+  --color-gold-200: #eddcc4;
+  --color-gold-300: #e2cca8;
+  --color-gold-400: #d4b58b;
+  --color-gold-500: #c5a880;
+  --color-gold-600: #b39366;
+  --color-gold-700: #96784d;
+
+  --color-charcoal-950: #0a0a0b;
+  --color-charcoal-900: #0f0f11;
+  --color-charcoal-850: #141417;
+  --color-charcoal-800: #1a1a1f;
+  --color-charcoal-700: #24242c;
+  --color-charcoal-600: #32323d;
+}
+
+/* Custom base styles */
+html {
+  color-scheme: dark;
+}
+
+body {
+  background-color: #0f0f11;
+  color: #e8e6e1;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+/* Luxury typography helper */
+.font-editorial {
+  font-family: var(--font-serif);
+}
+
+/* Subtle luxury glow and backdrop glass */
+.glass-panel {
+  background: rgba(23, 23, 26, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-nav {
+  background: rgba(15, 15, 17, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Custom sleek scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f0f11;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2a2a33;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #c5a880;
+}
