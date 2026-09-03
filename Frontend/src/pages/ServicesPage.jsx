@@ -4,6 +4,7 @@ import { Check, ArrowRight, MessageCircle } from 'lucide-react';
 import { servicesData } from '../data/services.js';
 import { businessInfo } from '../data/business.js';
 import { apiService } from '../services/api.js';
+import { resolveImageUrl, handleImageError, defaultServiceImages } from '../utils/imageHelper.js';
 import Container from '../components/common/Container.jsx';
 import SectionHeading from '../components/common/SectionHeading.jsx';
 import Button from '../components/common/Button.jsx';
@@ -70,8 +71,9 @@ export const ServicesPage = () => {
                   >
                     <div className="relative h-[380px] sm:h-[460px] w-full border border-white/10 overflow-hidden bg-black/40 group">
                       <img
-                        src={service.image}
+                        src={resolveImageUrl(service.image, service.slug || service.title)}
                         alt={service.title}
+                        onError={(e) => handleImageError(e, defaultServiceImages[(service.slug || service.title || 'kitchen').toLowerCase()] || defaultServiceImages.kitchen)}
                         className="w-full h-full object-cover transform group-hover:scale-106 transition-transform duration-700 ease-out"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f11]/80 via-transparent to-transparent" />

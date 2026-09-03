@@ -2,8 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowUpRight, Check } from 'lucide-react';
+import { resolveImageUrl, handleImageError, defaultServiceImages } from '../../utils/imageHelper.js';
 
 export const ServiceCard = ({ service, index = 0 }) => {
+  const fallbackKey = (service.slug || service.title || 'kitchen').toLowerCase();
+  const resolvedImage = resolveImageUrl(service.image, fallbackKey);
+  const fallbackUrl = defaultServiceImages[fallbackKey] || defaultServiceImages.kitchen;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -15,17 +20,18 @@ export const ServiceCard = ({ service, index = 0 }) => {
       {/* Image container with subtle zoom */}
       <div className="relative h-64 sm:h-72 w-full overflow-hidden bg-black/40">
         <img
-          src={service.image}
+          src={resolvedImage}
           alt={service.title}
           loading="lazy"
+          onError={(e) => handleImageError(e, fallbackUrl)}
           className="w-full h-full object-cover object-center transform group-hover:scale-108 group-hover:brightness-105 transition-all duration-700 ease-out"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#17171a] via-[#17171a]/40 to-transparent" />
         
         {/* Category / Tag badge */}
-        {service.tag && (
+        {(service.tag || service.title) && (
           <span className="absolute top-4 left-4 bg-black/60 backdrop-blur-md text-[#c5a880] text-[10px] uppercase tracking-[0.2em] font-medium px-3 py-1 border border-white/10">
-            {service.tag}
+            {service.tag || service.title}
           </span>
         )}
       </div>
@@ -43,7 +49,7 @@ export const ServiceCard = ({ service, index = 0 }) => {
           </div>
 
           <p className="text-sm text-stone-400 font-light leading-relaxed mb-6">
-            {service.shortDescription}
+            {service.shortDescription || service.description}
           </p>
 
           {/* Key Features List */}
@@ -61,7 +67,7 @@ export const ServiceCard = ({ service, index = 0 }) => {
 
         {/* Action Link */}
         <Link
-          to="/services"
+          to={`/services#${service.slug || ''}`}
           className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] font-medium text-[#c5a880] hover:text-[#d4b58b] pt-4 border-t border-white/5 transition-colors"
         >
           <span>Explore Details</span>

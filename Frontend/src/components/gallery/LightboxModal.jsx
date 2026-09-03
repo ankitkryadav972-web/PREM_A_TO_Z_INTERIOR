@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, MessageCircle, MapPin } from 'lucide-react';
 import { businessInfo } from '../../data/business.js';
+import { resolveImageUrl, handleImageError, defaultGalleryImages } from '../../utils/imageHelper.js';
 
 export const LightboxModal = ({ item, onClose }) => {
   // Listen for Escape key
@@ -14,6 +15,8 @@ export const LightboxModal = ({ item, onClose }) => {
   }, [onClose]);
 
   if (!item) return null;
+
+  const resolvedImage = resolveImageUrl(item.image, item.category || 'kitchen');
 
   const whatsappInquiryUrl = `https://wa.me/91${businessInfo.whatsappPrimary}?text=${encodeURIComponent(
     `Hello Prem A to Z Interior Design, I am interested in this design from your gallery: ${item.title} (${item.category}). Please share details.`
@@ -51,8 +54,9 @@ export const LightboxModal = ({ item, onClose }) => {
           {/* Image */}
           <div className="md:w-3/5 bg-black/60 relative min-h-[300px] md:min-h-[500px]">
             <img
-              src={item.image}
+              src={resolvedImage}
               alt={item.title}
+              onError={(e) => handleImageError(e, defaultGalleryImages[0])}
               className="w-full h-full object-cover object-center"
             />
           </div>

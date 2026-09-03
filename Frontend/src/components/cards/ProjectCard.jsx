@@ -1,8 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Maximize2, MapPin } from 'lucide-react';
+import { resolveImageUrl, handleImageError, defaultGalleryImages } from '../../utils/imageHelper.js';
 
 export const ProjectCard = ({ project, onSelect, index = 0 }) => {
+  const fallbackIndex = index % defaultGalleryImages.length;
+  const fallbackUrl = defaultGalleryImages[fallbackIndex];
+  const resolvedImage = resolveImageUrl(project.image, project.category || 'kitchen');
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -14,9 +19,10 @@ export const ProjectCard = ({ project, onSelect, index = 0 }) => {
     >
       {/* Background Image */}
       <img
-        src={project.image}
+        src={resolvedImage}
         alt={project.title}
         loading="lazy"
+        onError={(e) => handleImageError(e, fallbackUrl)}
         className="w-full h-full object-cover object-center transform group-hover:scale-108 transition-all duration-700 ease-out"
       />
 

@@ -58,7 +58,7 @@ const seedData = async () => {
         description:
           'Custom luxury wooden and flush doors, decorative veneer doors, and sturdy security doors designed to match your interior architecture.',
         shortDescription: 'Custom wooden, flush, and decorative doors tailored for durability and elegance.',
-        image: '/uploads/sample-doors.jpg',
+        image: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80',
         features: [
           'Solid teak & flush wood options',
           'Premium veneer & laminate finishes',
@@ -73,7 +73,7 @@ const seedData = async () => {
         description:
           'Modern modular kitchen solutions with smart storage, soft-close hardware, premium quartz countertops, and water-resistant boiling-water-proof (BWP) ply.',
         shortDescription: 'Ergonomic, modern modular kitchens with premium hardware and smart storage.',
-        image: '/uploads/sample-kitchen.jpg',
+        image: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=80',
         features: [
           'L-shaped, U-shaped, and Island designs',
           'Tandem boxes with soft-close mechanisms',
@@ -88,7 +88,7 @@ const seedData = async () => {
         description:
           'Artistic gypsum and POP false ceilings, cove lighting grids, acoustic insulation, and contemporary architectural patterns for living rooms and bedrooms.',
         shortDescription: 'Artistic gypsum & POP false ceilings with designer cove lighting.',
-        image: '/uploads/sample-ceiling.jpg',
+        image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
         features: [
           'Seamless Gyproc gypsum boards',
           'Indirect ambient LED cove lighting',
@@ -103,7 +103,7 @@ const seedData = async () => {
         description:
           'Complete concealed electrical wiring, designer lighting fixtures, smart switch integrations, MCB distribution boxes, and safety certification.',
         shortDescription: 'Turnkey concealed electrical installation, designer fixtures, and safety switchboards.',
-        image: '/uploads/sample-electrical.jpg',
+        image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=1200&q=80',
         features: [
           'Concealed FR fire-retardant wiring',
           'Modular switch plates and smart automation',
@@ -118,7 +118,7 @@ const seedData = async () => {
         description:
           'End-to-end turnkey woodwork including custom sliding wardrobes, ergonomic beds, floating TV units, crockery display cabinets, and study workstations.',
         shortDescription: 'Custom wardrobes, beds, TV units, and bespoke woodwork built to perfection.',
-        image: '/uploads/sample-furniture.jpg',
+        image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=80',
         features: [
           'Full-height sliding and openable wardrobes',
           'Hydraulic storage beds with upholstered headboards',
@@ -140,7 +140,7 @@ const seedData = async () => {
         slug: slugify('Teak Finish Solid Wooden Door'),
         category: 'Doors',
         description: 'Handcrafted solid teak wooden door with intricate groove details and weatherproof coating.',
-        images: ['/uploads/sample-door-1.jpg'],
+        images: ['https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80'],
         features: ['Natural Teak Grain', 'Weather-resistant PU polish', 'Standard 7x3.5 ft'],
         isActive: true
       },
@@ -149,7 +149,7 @@ const seedData = async () => {
         slug: slugify('L-Shaped Acrylic Modular Kitchen'),
         category: 'Kitchen',
         description: 'Contemporary L-shaped modular kitchen with high-gloss anti-scratch acrylic shutters and quartz countertop.',
-        images: ['/uploads/sample-kitchen-1.jpg'],
+        images: ['https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=80'],
         features: ['Hettich soft-close channels', 'Built-in cutlery and thali trays', 'Concealed profile handles'],
         isActive: true
       },
@@ -158,7 +158,7 @@ const seedData = async () => {
         slug: slugify('Modern Gypsum False Ceiling with LED Profiles'),
         category: 'POP & False Ceiling',
         description: 'Minimalist living room ceiling layout featuring recessed COB lights and continuous warm white profile channels.',
-        images: ['/uploads/sample-ceiling-1.jpg'],
+        images: ['https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80'],
         features: ['Fire-resistant Gyproc', 'Dual-circuit lighting control', 'Smooth matte paint finish'],
         isActive: true
       },
@@ -167,7 +167,7 @@ const seedData = async () => {
         slug: slugify('Full Height Sliding Wardrobe with Mirror Panel'),
         category: 'Complete Furniture Work',
         description: 'Space-saving 8-foot sliding wardrobe featuring bronze tinted mirror panels and interior sensor LED lights.',
-        images: ['/uploads/sample-wardrobe-1.jpg'],
+        images: ['https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&w=1200&q=80'],
         features: ['Smooth anti-jump rollers', 'Dedicated locker and saree organizer', 'Soft-cushion bumpers'],
         isActive: true
       }
@@ -182,29 +182,43 @@ const seedData = async () => {
       {
         title: 'Luxury Living Room Interior',
         category: 'Living Room',
-        image: '/uploads/sample-gallery-1.jpg',
+        image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
         description: 'Warm lighting paired with Italian marble flooring, custom TV unit, and POP ceiling.',
         isPublished: true
       },
       {
         title: 'Modern Minimalist Island Kitchen',
         category: 'Kitchen',
-        image: '/uploads/sample-gallery-2.jpg',
+        image: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=80',
         description: 'High-gloss dual-tone modular kitchen with breakfast counter in Gorakhpur residence.',
         isPublished: true
       },
       {
         title: 'Designer Bedroom False Ceiling',
         category: 'Ceiling',
-        image: '/uploads/sample-gallery-3.jpg',
+        image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=1200&q=80',
         description: 'Cove lighting and geometric grid ceiling enhancing cozy bedroom ambiance.',
         isPublished: true
       },
       {
         title: 'Master Bedroom Wardrobe & Headboard',
         category: 'Bedroom',
-        image: '/uploads/sample-gallery-4.jpg',
+        image: 'https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&w=1200&q=80',
         description: 'Custom fluted panel bed back with matching sliding wardrobe.',
+        isPublished: true
+      },
+      {
+        title: 'Solid Teak Double Entrance Door',
+        category: 'Doors',
+        image: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80',
+        description: 'Monumental pivot door engineered in genuine Burma teak with brass accents.',
+        isPublished: true
+      },
+      {
+        title: 'Turnkey Penthouse Interior',
+        category: 'Complete Interior',
+        image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=80',
+        description: 'Comprehensive 4BHK interior covering woodwork, false ceilings, lighting and furniture.',
         isPublished: true
       }
     ];

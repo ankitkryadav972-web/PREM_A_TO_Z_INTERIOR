@@ -2,11 +2,15 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { MessageCircle, Check } from 'lucide-react';
 import { businessInfo } from '../../data/business.js';
+import { resolveImageUrl, handleImageError, defaultGalleryImages } from '../../utils/imageHelper.js';
 
 export const ProductCard = ({ product, onSelect, index = 0 }) => {
   const whatsappProductUrl = `https://wa.me/91${businessInfo.whatsappPrimary}?text=${encodeURIComponent(
     `Hello Prem A to Z Interior Design, I am interested in your product: ${product.name} (${product.category}). Please share catalog & price details.`
   )}`;
+
+  const resolvedImage = resolveImageUrl(product.image || product.images?.[0], product.category || 'furniture');
+  const fallbackUrl = defaultGalleryImages[index % defaultGalleryImages.length];
 
   return (
     <motion.div
@@ -19,9 +23,10 @@ export const ProductCard = ({ product, onSelect, index = 0 }) => {
       {/* Product Image */}
       <div className="relative h-60 w-full overflow-hidden bg-black/40">
         <img
-          src={product.image}
+          src={resolvedImage}
           alt={product.name}
           loading="lazy"
+          onError={(e) => handleImageError(e, fallbackUrl)}
           className="w-full h-full object-cover object-center transform group-hover:scale-106 transition-transform duration-700 ease-out"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#17171a] via-transparent to-transparent opacity-80" />
@@ -44,22 +49,22 @@ export const ProductCard = ({ product, onSelect, index = 0 }) => {
 
           {/* Bullet specifications */}
           {product.features && (
-            <ul className="space-y-1.5 mb-6 pt-3 border-t border-white/5">
-              {product.features.slice(0, 3).map((feature, idx) => (
-                <li key={idx} className="flex items-center gap-2 text-xs text-stone-300">
-                  <Check className="w-3 h-3 text-[#c5a880] shrink-0" />
-                  <span className="truncate">{feature}</span>
+            <ul className="space-y-1.5 mb-6">
+              {product.features.slice(0, 3).map((feat, idx) => (
+                <li key={idx} className="flex items-center gap-2 text-xs text-stone-300 font-light">
+                  <Check className="w-3.5 h-3.5 text-[#c5a880] shrink-0" />
+                  <span>{feat}</span>
                 </li>
               ))}
             </ul>
           )}
         </div>
 
-        {/* Action button */}
+        {/* Action Buttons */}
         <div className="pt-4 border-t border-white/5 flex items-center justify-between gap-3">
           <button
             onClick={() => onSelect && onSelect(product)}
-            className="text-xs uppercase tracking-wider text-stone-300 hover:text-white font-medium transition-colors"
+            className="text-xs uppercase tracking-wider text-[#c5a880] hover:text-white font-medium transition-colors cursor-pointer"
           >
             Quick Specs
           </button>
@@ -68,9 +73,9 @@ export const ProductCard = ({ product, onSelect, index = 0 }) => {
             href={whatsappProductUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-[#1f1f26] hover:bg-[#c5a880] text-stone-200 hover:text-[#0f0f11] text-xs font-semibold uppercase tracking-wider px-3.5 py-2 border border-white/10 hover:border-[#c5a880] transition-all duration-300"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#25D366]/10 hover:bg-[#25D366] text-[#25D366] hover:text-white border border-[#25D366]/30 text-xs font-semibold uppercase tracking-wider transition-colors"
           >
-            <MessageCircle className="w-3.5 h-3.5" />
+            <MessageCircle className="w-3.5 h-3.5 fill-current" />
             <span>Enquire</span>
           </a>
         </div>
