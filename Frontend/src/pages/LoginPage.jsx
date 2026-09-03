@@ -1,19 +1,22 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Lock, User, ArrowRight, CheckCircle2, Shield } from 'lucide-react';
+import { Lock, User, ArrowRight, CheckCircle2, Shield, AlertCircle } from 'lucide-react';
 import Container from '../components/common/Container.jsx';
 import Button from '../components/common/Button.jsx';
-import { businessInfo } from '../data/business.js';
+import { useAuth } from '../context/AuthContext.jsx';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
+
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!identifier.trim() || !password.trim()) {
@@ -22,17 +25,27 @@ export const LoginPage = () => {
     }
 
     setError('');
-    setSuccess(true);
+    setIsSubmitting(true);
 
-    // Frontend demo redirect after brief visual feedback
-    setTimeout(() => {
-      // If admin demo credential used, send to admin dashboard, else home
-      if (identifier.toLowerCase().includes('admin')) {
-        navigate('/admin');
-      } else {
-        navigate('/');
-      }
-    }, 1000);
+    try {
+      const loggedInUser = await login({
+        identifier: identifier.trim(),
+        password: password.trim()
+      });
+
+      setSuccess(true);
+      setTimeout(() => {
+        if (loggedInUser?.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/');
+        }
+      }, 700);
+    } catch (err) {
+      setError(err.message || 'Invalid email/mobile or password.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleQuickFill = (role) => {
@@ -58,7 +71,7 @@ export const LoginPage = () => {
               Sign In to Your Account
             </h1>
             <p className="text-xs sm:text-sm text-stone-400 font-light">
-              Access your spatial designs, quotation BoQ, and project updates.
+              Connected live to the Prem A to Z Interior Design backend API.
             </p>
           </div>
 
@@ -66,7 +79,7 @@ export const LoginPage = () => {
           <div className="mb-6 p-3 bg-white/5 border border-white/10 flex items-center justify-between text-xs">
             <span className="text-stone-400 flex items-center gap-1.5">
               <Shield className="w-3.5 h-3.5 text-[#c5a880]" />
-              Demo Credentials:
+              Quick Fill:
             </span>
             <div className="flex gap-2">
               <button
@@ -88,15 +101,16 @@ export const LoginPage = () => {
           </div>
 
           {error && (
-            <div className="mb-6 p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-xs">
-              {error}
+            <div className="mb-6 p-3.5 bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{error}</span>
             </div>
           )}
 
           {success && (
-            <div className="mb-6 p-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4" />
-              <span>Login successful! Redirecting...</span>
+            <div className="mb-6 p-3.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 shrink-0" />
+              <span>Login successful! Connecting to session...</span>
             </div>
           )}
 
@@ -122,7 +136,14 @@ export const LoginPage = () => {
                 <label className="text-xs uppercase tracking-wider text-stone-300 font-medium">
                   Password
                 </label>
-                <a href="#forgot" onClick={(e) => { e.preventDefault(); alert('Password recovery prototype: please contact your administrator.'); }} className="text-xs text-[#c5a880] hover:underline">
+                <a
+                  href="#forgot"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    alert('For password recovery, please call our studio at 9454107810.');
+                  }}
+                  className="text-xs text-[#c5a880] hover:underline"
+                >
                   Forgot?
                 </a>
               </div>
@@ -151,8 +172,15 @@ export const LoginPage = () => {
               </label>
             </div>
 
-            <Button type="submit" variant="primary" size="lg" className="w-full justify-center" icon={ArrowRight}>
-              Sign In
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              disabled={isSubmitting}
+              className="w-full justify-center"
+              icon={ArrowRight}
+            >
+              {isSubmitting ? 'Authenticating...' : 'Sign In'}
             </Button>
           </form>
 

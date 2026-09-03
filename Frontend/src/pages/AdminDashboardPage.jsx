@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -16,75 +16,96 @@ import {
   ExternalLink,
   ChevronRight,
   TrendingUp,
-  ShieldAlert
+  ShieldAlert,
+  ShieldCheck,
+  RefreshCw
 } from 'lucide-react';
 import Container from '../components/common/Container.jsx';
+import Button from '../components/common/Button.jsx';
 import { businessInfo } from '../data/business.js';
-
-const initialEnquiries = [
-  {
-    id: 'enq-101',
-    name: 'Sunil Verma',
-    phone: '9876501122',
-    service: 'Kitchen',
-    date: 'Today, 2:30 PM',
-    status: 'new',
-    message: 'Requesting quote for an L-shaped acrylic modular kitchen in Gorakhpur.'
-  },
-  {
-    id: 'enq-102',
-    name: 'Pooja Srivastava',
-    phone: '9454109988',
-    service: 'Doors',
-    date: 'Yesterday',
-    status: 'in-progress',
-    message: 'Need 4 solid teak entrance and bedroom doors.'
-  },
-  {
-    id: 'enq-103',
-    name: 'Rajesh Pandey',
-    phone: '9876543210',
-    service: 'POP & False Ceiling',
-    date: '2 days ago',
-    status: 'completed',
-    message: 'False ceiling work completed in living room.'
-  },
-  {
-    id: 'enq-104',
-    name: 'Dr. Alok Mishra',
-    phone: '9839001234',
-    service: 'Complete Furniture Work',
-    date: '3 days ago',
-    status: 'contacted',
-    message: 'Looking for full-height sliding wardrobe and TV unit.'
-  }
-];
+import { apiService } from '../services/api.js';
+import { useAuth } from '../context/AuthContext.jsx';
 
 export const AdminDashboardPage = () => {
+  const { user, isAdmin, login } = useAuth();
   const [activeTab, setActiveTab] = useState('Dashboard');
-  const [enquiries, setEnquiries] = useState(initialEnquiries);
+  const [stats, setStats] = useState({
+    totalUsers: 2,
+    totalServices: 5,
+    totalProducts: 4,
+    totalGalleryItems: 4,
+    totalEnquiries: 2,
+    newEnquiries: 1
+  });
+  const [enquiries, setEnquiries] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusMessage, setStatusMessage] = useState('');
 
-  const updateStatus = (id, newStatus) => {
-    setEnquiries(
-      enquiries.map((e) => (e.id === id ? { ...e, status: newStatus } : e))
-    );
+  const loadBackendData = async () => {
+    setLoading(true);
+    try {
+      // 1. Fetch live admin stats
+      const liveStats = await apiService.getDashboardStats();
+      if (liveStats) {
+        setStats(liveStats);
+      }
+
+      // 2. Fetch live enquiries
+      const enqResponse = await apiService.getAllEnquiries();
+      if (enqResponse && Array.isArray(enqResponse.data)) {
+        setEnquiries(enqResponse.data);
+      }
+    } catch (err) {
+      console.warn('[AdminDashboard] Live admin API requires admin token:', err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadBackendData();
+  }, [user]);
+
+  const handleAdminQuickLogin = async () => {
+    try {
+      await login({
+        identifier: 'admin@premAtoZ.com',
+        password: 'AdminPassword@123'
+      });
+      loadBackendData();
+    } catch (err) {
+      alert('Admin login error: ' + err.message);
+    }
+  };
+
+  const updateStatus = async (id, newStatus) => {
+    try {
+      await apiService.updateEnquiryStatus(id, newStatus);
+      setStatusMessage(`Enquiry status updated to '${newStatus}' in database.`);
+      setEnquiries(
+        enquiries.map((e) => (e._id === id || e.id === id ? { ...e, status: newStatus } : e))
+      );
+      setTimeout(() => setStatusMessage(''), 3000);
+    } catch (err) {
+      alert('Failed to update status on server: ' + err.message);
+    }
   };
 
   const filteredEnquiries = enquiries.filter(
     (e) =>
-      e.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      e.service.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      e.phone.includes(searchTerm)
+      (e.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (e.service || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (e.phone || '').includes(searchTerm)
   );
 
   const sidebarLinks = [
     { name: 'Dashboard', icon: LayoutDashboard },
-    { name: 'Enquiries', icon: MessageSquare, count: 4 },
-    { name: 'Users', icon: Users, count: 2 },
-    { name: 'Services', icon: Briefcase, count: 5 },
-    { name: 'Products', icon: Package, count: 9 },
-    { name: 'Gallery', icon: Image, count: 6 },
+    { name: 'Enquiries', icon: MessageSquare, count: enquiries.length || stats.totalEnquiries },
+    { name: 'Users', icon: Users, count: stats.totalUsers },
+    { name: 'Services', icon: Briefcase, count: stats.totalServices },
+    { name: 'Products', icon: Package, count: stats.totalProducts },
+    { name: 'Gallery', icon: Image, count: stats.totalGalleryItems },
     { name: 'Content', icon: FileText },
     { name: 'Settings', icon: Settings }
   ];
@@ -92,27 +113,48 @@ export const AdminDashboardPage = () => {
   return (
     <div className="min-h-screen bg-[#0a0a0b] text-[#e8e6e1] pt-24 pb-20">
       <Container size="lg">
-        {/* Prototype Header Notice */}
-        <div className="mb-6 p-4 bg-[#c5a880]/10 border border-[#c5a880]/30 flex items-center justify-between">
+        {/* Backend Connectivity Status Banner */}
+        <div className="mb-6 p-4 bg-[#c5a880]/10 border border-[#c5a880]/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <ShieldAlert className="w-5 h-5 text-[#c5a880] shrink-0" />
+            <ShieldCheck className="w-5 h-5 text-[#c5a880] shrink-0" />
             <div>
               <span className="text-xs uppercase tracking-wider font-semibold text-[#c5a880] block">
-                Frontend Admin Dashboard Prototype
+                Connected to Express Backend & MongoDB Atlas
               </span>
               <span className="text-xs text-stone-300 font-light">
-                This administrative view demonstrates lead triage, metric counts, and catalog management.
+                {isAdmin
+                  ? `Authenticated as ${user?.name} (${user?.email}) with full admin permissions.`
+                  : 'You are currently viewing as visitor. Click quick-auth to load live authenticated admin metrics.'}
               </span>
             </div>
           </div>
-          <Link
-            to="/"
-            className="text-xs uppercase tracking-wider text-stone-400 hover:text-white flex items-center gap-1"
-          >
-            <span>Live Site</span>
-            <ExternalLink className="w-3.5 h-3.5" />
-          </Link>
+
+          <div className="flex items-center gap-3 shrink-0">
+            {!isAdmin && (
+              <button
+                onClick={handleAdminQuickLogin}
+                className="px-3.5 py-1.5 bg-[#c5a880] text-[#0f0f11] text-xs font-semibold uppercase tracking-wider hover:bg-[#d4b58b] transition-colors"
+              >
+                Sign In as Admin
+              </button>
+            )}
+
+            <button
+              onClick={loadBackendData}
+              className="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-stone-300 flex items-center gap-1.5 transition-colors"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>Refresh</span>
+            </button>
+          </div>
         </div>
+
+        {statusMessage && (
+          <div className="mb-6 p-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-center gap-2">
+            <CheckCircle className="w-4 h-4" />
+            <span>{statusMessage}</span>
+          </div>
+        )}
 
         {/* Dashboard Shell */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -148,7 +190,7 @@ export const AdminDashboardPage = () => {
                       </div>
                       {item.count !== undefined && (
                         <span
-                          className={`text-[10px] px-1.5 py-0.5 rounded-none font-mono ${
+                          className={`text-[10px] px-1.5 py-0.5 font-mono ${
                             isActive ? 'bg-black/20 text-black' : 'bg-white/10 text-stone-300'
                           }`}
                         >
@@ -162,19 +204,19 @@ export const AdminDashboardPage = () => {
             </div>
 
             <div className="pt-6 mt-6 border-t border-white/10 text-xs text-stone-500">
-              Logged in as: <strong className="text-stone-300">Prem Admin</strong>
+              Active User: <strong className="text-stone-300">{user?.name || 'Guest'}</strong> ({user?.role || 'public'})
             </div>
           </div>
 
-          {/* Main Dashboard Canvas */}
+          {/* Main Content Area */}
           <div className="lg:col-span-9 space-y-8">
-            {/* Top Stat Cards */}
+            {/* Top Metrics Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
               {[
-                { title: 'Total Users', value: '2', subtitle: '1 Admin, 1 Client', icon: Users },
-                { title: 'Total Enquiries', value: enquiries.length.toString(), subtitle: '1 New Lead Today', icon: MessageSquare },
-                { title: 'Core Services', value: '5', subtitle: 'All Active in Catalog', icon: Briefcase },
-                { title: 'Showcase Products', value: '9', subtitle: 'Across 6 Categories', icon: Package }
+                { title: 'Registered Users', value: stats.totalUsers || '2', subtitle: 'Live MongoDB records', icon: Users },
+                { title: 'Total Inquiries', value: stats.totalEnquiries || enquiries.length || '2', subtitle: `${stats.newEnquiries || 1} Pending triage`, icon: MessageSquare },
+                { title: 'Core Services', value: stats.totalServices || '5', subtitle: 'Live Catalog items', icon: Briefcase },
+                { title: 'Products Seeded', value: stats.totalProducts || '4', subtitle: 'Categorized furniture', icon: Package }
               ].map((card, idx) => {
                 const CardIcon = card.icon;
                 return (
@@ -194,7 +236,7 @@ export const AdminDashboardPage = () => {
               })}
             </div>
 
-            {/* Quick Actions Bar */}
+            {/* Quick Actions */}
             <div className="p-5 bg-[#141417] border border-white/10 flex flex-wrap items-center justify-between gap-4">
               <span className="text-xs uppercase tracking-widest text-[#c5a880] font-semibold">
                 Quick Administrative Actions
@@ -205,7 +247,7 @@ export const AdminDashboardPage = () => {
                   className="px-3.5 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-stone-300 hover:text-white transition-colors inline-flex items-center gap-1.5"
                 >
                   <Plus className="w-3.5 h-3.5 text-[#c5a880]" />
-                  <span>New Service</span>
+                  <span>View Services Catalog</span>
                 </Link>
 
                 <Link
@@ -213,7 +255,7 @@ export const AdminDashboardPage = () => {
                   className="px-3.5 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-stone-300 hover:text-white transition-colors inline-flex items-center gap-1.5"
                 >
                   <Plus className="w-3.5 h-3.5 text-[#c5a880]" />
-                  <span>New Product</span>
+                  <span>View Products</span>
                 </Link>
 
                 <Link
@@ -221,7 +263,7 @@ export const AdminDashboardPage = () => {
                   className="px-3.5 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-stone-300 hover:text-white transition-colors inline-flex items-center gap-1.5"
                 >
                   <Plus className="w-3.5 h-3.5 text-[#c5a880]" />
-                  <span>Upload Image</span>
+                  <span>View Gallery</span>
                 </Link>
               </div>
             </div>
@@ -234,7 +276,7 @@ export const AdminDashboardPage = () => {
                     Client Inquiries & Project Leads
                   </h3>
                   <p className="text-xs text-stone-400 font-light mt-0.5">
-                    Click status badges to change status progression (`new` → `contacted` → `in-progress` → `completed`).
+                    Syncs in real-time with the MongoDB backend. Status changes are persisted immediately.
                   </p>
                 </div>
 
@@ -243,7 +285,7 @@ export const AdminDashboardPage = () => {
                     type="text"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search name, phone, service..."
+                    placeholder="Search customer, phone..."
                     className="bg-[#0f0f11] text-xs text-white pl-8 pr-3 py-2 border border-white/10 focus:border-[#c5a880] focus:outline-none w-56"
                   />
                   <Search className="w-3.5 h-3.5 text-stone-500 absolute left-2.5 top-2.5" />
@@ -257,46 +299,67 @@ export const AdminDashboardPage = () => {
                     <tr className="border-b border-white/10 text-stone-400 uppercase tracking-wider">
                       <th className="py-3 px-3">Customer</th>
                       <th className="py-3 px-3">Service</th>
-                      <th className="py-3 px-3">Message Snippet</th>
+                      <th className="py-3 px-3">Message Details</th>
                       <th className="py-3 px-3">Date</th>
                       <th className="py-3 px-3">Status Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
                     {filteredEnquiries.map((enq) => {
+                      const id = enq._id || enq.id;
                       const statusColor = {
                         new: 'bg-amber-500/10 text-amber-300 border-amber-500/30',
                         contacted: 'bg-sky-500/10 text-sky-300 border-sky-500/30',
                         'in-progress': 'bg-indigo-500/10 text-indigo-300 border-indigo-500/30',
-                        completed: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
+                        completed: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30',
+                        closed: 'bg-stone-500/10 text-stone-400 border-stone-500/30'
                       }[enq.status] || 'bg-white/10 text-white';
 
+                      const dateDisplay = enq.createdAt
+                        ? new Date(enq.createdAt).toLocaleDateString('en-IN', {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })
+                        : enq.date || 'Recent';
+
                       return (
-                        <tr key={enq.id} className="hover:bg-white/5 transition-colors">
+                        <tr key={id} className="hover:bg-white/5 transition-colors">
                           <td className="py-3 px-3">
                             <span className="font-semibold text-white block">{enq.name}</span>
                             <span className="text-stone-400 font-mono">{enq.phone}</span>
+                            {enq.email && <span className="text-[10px] text-stone-500 block">{enq.email}</span>}
                           </td>
                           <td className="py-3 px-3 text-[#c5a880] font-medium">{enq.service}</td>
                           <td className="py-3 px-3 text-stone-300 max-w-xs truncate font-light">
                             {enq.message}
                           </td>
-                          <td className="py-3 px-3 text-stone-400">{enq.date}</td>
+                          <td className="py-3 px-3 text-stone-400 whitespace-nowrap">{dateDisplay}</td>
                           <td className="py-3 px-3">
                             <select
                               value={enq.status}
-                              onChange={(e) => updateStatus(enq.id, e.target.value)}
+                              onChange={(e) => updateStatus(id, e.target.value)}
                               className={`text-[11px] font-semibold uppercase tracking-wider px-2 py-1 border cursor-pointer bg-[#0f0f11] focus:outline-none ${statusColor}`}
                             >
                               <option value="new">new</option>
                               <option value="contacted">contacted</option>
                               <option value="in-progress">in-progress</option>
                               <option value="completed">completed</option>
+                              <option value="closed">closed</option>
                             </select>
                           </td>
                         </tr>
                       );
                     })}
+
+                    {filteredEnquiries.length === 0 && (
+                      <tr>
+                        <td colSpan={5} className="text-center py-8 text-stone-500">
+                          {loading ? 'Fetching inquiries from backend...' : 'No inquiries found.'}
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>

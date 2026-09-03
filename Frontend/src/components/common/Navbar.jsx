@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Phone, ArrowUpRight } from 'lucide-react';
+import { Menu, X, Phone, ArrowUpRight, User, LogOut, ShieldCheck } from 'lucide-react';
 import { businessInfo } from '../../data/business.js';
+import { useAuth } from '../../context/AuthContext.jsx';
 import Container from './Container.jsx';
 
 const navLinks = [
@@ -18,6 +19,7 @@ export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
 
   // Close mobile menu whenever route changes
   useEffect(() => {
@@ -88,8 +90,42 @@ export const Navbar = () => {
             ))}
           </nav>
 
-          {/* Right Action: Call + Get a Quote */}
+          {/* Right Action: Auth / User Status + Call + Get a Quote */}
           <div className="hidden lg:flex items-center gap-5">
+            {isAuthenticated ? (
+              <div className="flex items-center gap-4 border-r border-white/10 pr-4">
+                {isAdmin ? (
+                  <Link
+                    to="/admin"
+                    className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-[#c5a880] hover:text-[#d4b58b] bg-[#c5a880]/10 px-2.5 py-1 border border-[#c5a880]/30"
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>Admin</span>
+                  </Link>
+                ) : (
+                  <span className="flex items-center gap-1.5 text-xs text-stone-300">
+                    <User className="w-3.5 h-3.5 text-[#c5a880]" />
+                    <span className="truncate max-w-[120px]">{user?.name}</span>
+                  </span>
+                )}
+
+                <button
+                  onClick={logout}
+                  title="Logout"
+                  className="text-stone-400 hover:text-red-400 p-1 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className="text-xs uppercase tracking-wider text-stone-300 hover:text-white transition-colors"
+              >
+                Sign In
+              </Link>
+            )}
+
             <a
               href={businessInfo.telUrl}
               className="flex items-center gap-2 text-xs uppercase tracking-wider text-stone-300 hover:text-[#c5a880] transition-colors duration-300"
@@ -130,6 +166,24 @@ export const Navbar = () => {
             className="lg:hidden bg-[#141417]/98 backdrop-blur-2xl border-b border-white/10 overflow-hidden"
           >
             <Container className="py-6 flex flex-col gap-4">
+              {isAuthenticated && (
+                <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                  <div className="flex items-center gap-2 text-xs text-white">
+                    <User className="w-4 h-4 text-[#c5a880]" />
+                    <span>Signed in as <strong>{user?.name}</strong></span>
+                  </div>
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="text-[10px] uppercase tracking-wider text-[#c5a880] bg-[#c5a880]/10 px-2 py-0.5 border border-[#c5a880]/30"
+                    >
+                      Admin Console
+                    </Link>
+                  )}
+                </div>
+              )}
+
               {navLinks.map((link) => (
                 <NavLink
                   key={link.name}
@@ -146,6 +200,27 @@ export const Navbar = () => {
               ))}
 
               <div className="pt-4 flex flex-col gap-3">
+                {isAuthenticated ? (
+                  <button
+                    onClick={() => {
+                      logout();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="flex items-center justify-center gap-2 py-3 text-xs uppercase tracking-wider text-red-300 bg-red-500/10 border border-red-500/20"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Sign Out</span>
+                  </button>
+                ) : (
+                  <Link
+                    to="/login"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-center gap-2 py-3 text-xs uppercase tracking-wider text-white bg-white/5 border border-white/10"
+                  >
+                    <span>Client Portal Sign In</span>
+                  </Link>
+                )}
+
                 <a
                   href={businessInfo.telUrl}
                   className="flex items-center justify-center gap-2.5 py-3 text-xs uppercase tracking-wider text-white bg-white/5 border border-white/10 hover:border-[#c5a880]"

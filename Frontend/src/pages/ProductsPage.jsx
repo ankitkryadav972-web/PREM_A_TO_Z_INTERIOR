@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, Check, X, SlidersHorizontal } from 'lucide-react';
 import { productsData, productCategories } from '../data/products.js';
 import { businessInfo } from '../data/business.js';
+import { apiService } from '../services/api.js';
 import Container from '../components/common/Container.jsx';
 import ProductCard from '../components/cards/ProductCard.jsx';
 import CategoryFilter from '../components/gallery/CategoryFilter.jsx';
@@ -11,11 +12,31 @@ import Button from '../components/common/Button.jsx';
 export const ProductsPage = () => {
   const [activeCategory, setActiveCategory] = useState('All');
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [products, setProducts] = useState(productsData);
 
-  const filteredProducts =
-    activeCategory === 'All'
-      ? productsData
-      : productsData.filter((p) => p.category.toLowerCase() === activeCategory.toLowerCase());
+  React.useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const live = await apiService.getProducts(activeCategory);
+        if (live && live.length > 0) {
+          setProducts(live);
+        } else if (activeCategory === 'All') {
+          setProducts(productsData);
+        } else {
+          setProducts(productsData.filter((p) => p.category.toLowerCase() === activeCategory.toLowerCase()));
+        }
+      } catch {
+        setProducts(
+          activeCategory === 'All'
+            ? productsData
+            : productsData.filter((p) => p.category.toLowerCase() === activeCategory.toLowerCase())
+        );
+      }
+    };
+    fetchProducts();
+  }, [activeCategory]);
+
+  const filteredProducts = products;
 
   return (
     <div className="min-h-screen bg-[#0f0f11] text-[#e8e6e1] pt-28 pb-24">

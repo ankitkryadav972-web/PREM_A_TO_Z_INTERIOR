@@ -3,9 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Phone, Lock, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
 import Container from '../components/common/Container.jsx';
 import Button from '../components/common/Button.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
 
 export const RegisterPage = () => {
   const navigate = useNavigate();
+  const { register } = useAuth();
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -15,7 +18,9 @@ export const RegisterPage = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const [serverError, setServerError] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validate = () => {
     const errs = {};
@@ -25,7 +30,7 @@ export const RegisterPage = () => {
       errs.email = 'Valid email address is required';
     }
     if (!formData.mobile.trim() || !/^[6-9]\d{9}$/.test(formData.mobile.trim())) {
-      errs.mobile = 'Valid 10-digit Indian mobile number is required';
+      errs.mobile = 'Valid 10-digit Indian mobile number is required (starts with 6-9)';
     }
     if (!formData.password || formData.password.length < 6) {
       errs.password = 'Password must be at least 6 characters long';
@@ -38,14 +43,32 @@ export const RegisterPage = () => {
     return Object.keys(errs).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setServerError('');
+
     if (!validate()) return;
 
-    setIsSuccess(true);
-    setTimeout(() => {
-      navigate('/login');
-    }, 1500);
+    setIsSubmitting(true);
+
+    try {
+      await register({
+        name: formData.name.trim(),
+        email: formData.email.trim().toLowerCase(),
+        mobile: formData.mobile.trim(),
+        password: formData.password,
+        confirmPassword: formData.confirmPassword
+      });
+
+      setIsSuccess(true);
+      setTimeout(() => {
+        navigate('/');
+      }, 1000);
+    } catch (err) {
+      setServerError(err.message || 'Registration failed. Please check inputs.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -60,14 +83,21 @@ export const RegisterPage = () => {
               Create Client Account
             </h1>
             <p className="text-xs sm:text-sm text-stone-400 font-light">
-              Register to track your interior execution, milestones, and designs.
+              Connected to live Prem A to Z Interior Design backend database.
             </p>
           </div>
+
+          {serverError && (
+            <div className="mb-6 p-3.5 bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{serverError}</span>
+            </div>
+          )}
 
           {isSuccess && (
             <div className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-center gap-2.5">
               <CheckCircle2 className="w-5 h-5 shrink-0" />
-              <span>Registration successful! Redirecting you to sign in...</span>
+              <span>Registration successful! Redirecting to studio...</span>
             </div>
           )}
 
@@ -165,8 +195,15 @@ export const RegisterPage = () => {
               </div>
             </div>
 
-            <Button type="submit" variant="primary" size="lg" className="w-full justify-center mt-2" icon={ArrowRight}>
-              Create Account
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              disabled={isSubmitting}
+              className="w-full justify-center mt-2"
+              icon={ArrowRight}
+            >
+              {isSubmitting ? 'Registering...' : 'Create Account'}
             </Button>
           </form>
 

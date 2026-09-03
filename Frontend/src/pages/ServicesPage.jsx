@@ -3,12 +3,25 @@ import { motion } from 'framer-motion';
 import { Check, ArrowRight, MessageCircle } from 'lucide-react';
 import { servicesData } from '../data/services.js';
 import { businessInfo } from '../data/business.js';
+import { apiService } from '../services/api.js';
 import Container from '../components/common/Container.jsx';
 import SectionHeading from '../components/common/SectionHeading.jsx';
 import Button from '../components/common/Button.jsx';
 
 export const ServicesPage = () => {
-  const [selectedService, setSelectedService] = useState(null);
+  const [services, setServices] = useState(servicesData);
+
+  React.useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const live = await apiService.getServices();
+        if (live && live.length > 0) setServices(live);
+      } catch (err) {
+        console.warn('[ServicesPage] Using default services:', err);
+      }
+    };
+    fetchServices();
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#0f0f11] text-[#e8e6e1] pt-28 pb-24">
@@ -33,7 +46,7 @@ export const ServicesPage = () => {
       <section className="py-20">
         <Container size="lg">
           <div className="flex flex-col gap-24 md:gap-32">
-            {servicesData.map((service, index) => {
+            {services.map((service, index) => {
               const isEven = index % 2 === 1;
               const whatsappServiceUrl = `https://wa.me/91${businessInfo.whatsappPrimary}?text=${encodeURIComponent(
                 `Hello Prem A to Z Interior Design, I am interested in your ${service.title} services. Please share more details & arrange consultation.`

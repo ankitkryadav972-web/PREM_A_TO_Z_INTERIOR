@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { projectsData, galleryCategories } from '../data/projects.js';
+import { apiService } from '../services/api.js';
 import Container from '../components/common/Container.jsx';
 import ProjectCard from '../components/cards/ProjectCard.jsx';
 import CategoryFilter from '../components/gallery/CategoryFilter.jsx';
@@ -8,11 +9,31 @@ import LightboxModal from '../components/gallery/LightboxModal.jsx';
 export const GalleryPage = () => {
   const [activeCategory, setActiveCategory] = useState('All');
   const [selectedProject, setSelectedProject] = useState(null);
+  const [projects, setProjects] = useState(projectsData);
 
-  const filteredProjects =
-    activeCategory === 'All'
-      ? projectsData
-      : projectsData.filter((p) => p.category.toLowerCase() === activeCategory.toLowerCase());
+  React.useEffect(() => {
+    const fetchGallery = async () => {
+      try {
+        const live = await apiService.getGallery(activeCategory);
+        if (live && live.length > 0) {
+          setProjects(live);
+        } else if (activeCategory === 'All') {
+          setProjects(projectsData);
+        } else {
+          setProjects(projectsData.filter((p) => p.category.toLowerCase() === activeCategory.toLowerCase()));
+        }
+      } catch {
+        setProjects(
+          activeCategory === 'All'
+            ? projectsData
+            : projectsData.filter((p) => p.category.toLowerCase() === activeCategory.toLowerCase())
+        );
+      }
+    };
+    fetchGallery();
+  }, [activeCategory]);
+
+  const filteredProjects = projects;
 
   return (
     <div className="min-h-screen bg-[#0f0f11] text-[#e8e6e1] pt-28 pb-24">

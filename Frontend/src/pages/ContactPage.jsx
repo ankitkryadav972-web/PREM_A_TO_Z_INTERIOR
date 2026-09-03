@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Phone, MessageCircle, MapPin, Clock, Send, CheckCircle2, AlertCircle } from 'lucide-react';
 import { businessInfo } from '../data/business.js';
+import { apiService } from '../services/api.js';
+import { useAuth } from '../context/AuthContext.jsx';
 import Container from '../components/common/Container.jsx';
 import Button from '../components/common/Button.jsx';
 
@@ -19,16 +21,30 @@ const servicesList = [
 export const ContactPage = () => {
   const [searchParams] = useSearchParams();
   const preselectedService = searchParams.get('service') || '';
+  const { user } = useAuth();
 
   const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    email: '',
+    name: user?.name || '',
+    phone: user?.mobile || '',
+    email: user?.email || '',
     service: preselectedService || 'General Consultation',
     message: ''
   });
 
+  // Pre-fill if user logs in
+  useEffect(() => {
+    if (user) {
+      setFormData((prev) => ({
+        ...prev,
+        name: prev.name || user.name || '',
+        phone: prev.phone || user.mobile || '',
+        email: prev.email || user.email || ''
+      }));
+    }
+  }, [user]);
+
   const [errors, setErrors] = useState({});
+  const [serverError, setServerError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -42,7 +58,7 @@ export const ContactPage = () => {
     if (!formData.phone.trim()) {
       newErrors.phone = 'Phone number is required';
     } else if (!/^[0-9+\-\s()]{7,15}$/.test(formData.phone.trim())) {
-      newErrors.phone = 'Please enter a valid phone number (at least 10 digits)';
+      newErrors.phone = 'Please enter a valid phone number';
     }
 
     if (formData.email.trim() && !/^\S+@\S+\.\S+$/.test(formData.email.trim())) {
@@ -59,26 +75,37 @@ export const ContactPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setServerError('');
 
     if (!validateForm()) return;
 
     setIsSubmitting(true);
 
-    // Simulate polished demo submission delay
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      await apiService.submitEnquiry({
+        name: formData.name.trim(),
+        phone: formData.phone.trim(),
+        email: formData.email.trim(),
+        service: formData.service,
+        message: formData.message.trim()
+      });
+
       setIsSuccess(true);
       setFormData({
-        name: '',
-        phone: '',
-        email: '',
+        name: user?.name || '',
+        phone: user?.mobile || '',
+        email: user?.email || '',
         service: 'General Consultation',
         message: ''
       });
       setErrors({});
-    }, 800);
+    } catch (err) {
+      setServerError(err.message || 'Failed to submit enquiry. Please try again or WhatsApp us.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -222,8 +249,15 @@ export const ContactPage = () => {
                 Send a Message or Project Request
               </h3>
               <p className="text-xs sm:text-sm text-stone-400 font-light leading-relaxed mb-8">
-                Fill in your project scope below. We respond with initial recommendations within 24 hours.
+                Connected directly to Prem A to Z Interior Design backend lead pipeline.
               </p>
+
+              {serverError && (
+                <div className="mb-6 p-3.5 bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{serverError}</span>
+                </div>
+              )}
 
               <form onSubmit={handleSubmit} className="space-y-6" noValidate>
                 {/* Full Name */}
@@ -343,7 +377,7 @@ export const ContactPage = () => {
                     className="w-full justify-center"
                     icon={Send}
                   >
-                    {isSubmitting ? 'Sending Enquiry...' : 'Submit Project Enquiry'}
+                    {isSubmitting ? 'Submitting to Backend...' : 'Submit Project Enquiry'}
                   </Button>
                 </div>
               </form>
@@ -375,15 +409,15 @@ export const ContactPage = () => {
               </div>
 
               <span className="text-[10px] uppercase tracking-[0.3em] text-[#c5a880] font-semibold block mb-2">
-                Thank You
+                Submission Confirmed
               </span>
 
               <h3 className="font-editorial text-2xl sm:text-3xl font-normal text-white mb-3">
-                Enquiry Received
+                Lead Stored in Database
               </h3>
 
               <p className="text-sm text-stone-300 font-light leading-relaxed mb-6">
-                Your request has been received by <strong>{businessInfo.name}</strong>. Our interior design team will contact you shortly via phone or WhatsApp.
+                Your request has been registered in the <strong>{businessInfo.name}</strong> system. Our interior design team will contact you shortly via phone or WhatsApp.
               </p>
 
               <div className="flex flex-col gap-2.5">

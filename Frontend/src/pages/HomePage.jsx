@@ -17,6 +17,7 @@ import { projectsData } from '../data/projects.js';
 import { testimonialsData } from '../data/testimonials.js';
 import { statsData, processSteps, whyChooseUsData } from '../data/stats.js';
 
+import { apiService } from '../services/api.js';
 import Container from '../components/common/Container.jsx';
 import Button from '../components/common/Button.jsx';
 import SectionHeading from '../components/common/SectionHeading.jsx';
@@ -28,6 +29,27 @@ import LightboxModal from '../components/gallery/LightboxModal.jsx';
 export const HomePage = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [activeTestimonialIndex, setActiveTestimonialIndex] = useState(0);
+  const [services, setServices] = useState(servicesData);
+  const [projects, setProjects] = useState(projectsData);
+  const [testimonials, setTestimonials] = useState(testimonialsData);
+
+  React.useEffect(() => {
+    const fetchLiveData = async () => {
+      try {
+        const [liveServices, liveProjects, liveTestimonials] = await Promise.all([
+          apiService.getServices(),
+          apiService.getGallery(),
+          apiService.getTestimonials()
+        ]);
+        if (liveServices && liveServices.length > 0) setServices(liveServices);
+        if (liveProjects && liveProjects.length > 0) setProjects(liveProjects);
+        if (liveTestimonials && liveTestimonials.length > 0) setTestimonials(liveTestimonials);
+      } catch (err) {
+        console.warn('[HomePage] Connecting live data fallback:', err.message);
+      }
+    };
+    fetchLiveData();
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#0f0f11] text-[#e8e6e1] overflow-hidden">
@@ -228,8 +250,8 @@ export const HomePage = () => {
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {servicesData.map((service, index) => (
-              <ServiceCard key={service.id} service={service} index={index} />
+            {services.map((service, index) => (
+              <ServiceCard key={service._id || service.id} service={service} index={index} />
             ))}
           </div>
 
@@ -258,9 +280,9 @@ export const HomePage = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {projectsData.slice(0, 6).map((project, idx) => (
+            {projects.slice(0, 6).map((project, idx) => (
               <ProjectCard
-                key={project.id}
+                key={project._id || project.id}
                 project={project}
                 index={idx}
                 onSelect={(proj) => setSelectedProject(proj)}
@@ -351,16 +373,18 @@ export const HomePage = () => {
           />
 
           <div className="max-w-4xl mx-auto">
-            <TestimonialCard testimonial={testimonialsData[activeTestimonialIndex]} />
+            {testimonials.length > 0 && (
+              <TestimonialCard testimonial={testimonials[activeTestimonialIndex % testimonials.length]} />
+            )}
 
             {/* Testimonial Nav Pills */}
             <div className="flex items-center justify-center gap-2 mt-8">
-              {testimonialsData.map((_, idx) => (
+              {testimonials.map((_, idx) => (
                 <button
                   key={idx}
                   onClick={() => setActiveTestimonialIndex(idx)}
-                  className={`h-2 transition-all duration-300 rounded-none ${
-                    activeTestimonialIndex === idx ? 'w-8 bg-[#c5a880]' : 'w-2 bg-white/20 hover:bg-white/40'
+                  className={`h-2 transition-all duration-300 rounded-none cursor-pointer ${
+                    activeTestimonialIndex % testimonials.length === idx ? 'w-8 bg-[#c5a880]' : 'w-2 bg-white/20 hover:bg-white/40'
                   }`}
                   aria-label={`Go to testimonial ${idx + 1}`}
                 />
