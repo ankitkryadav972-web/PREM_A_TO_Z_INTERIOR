@@ -76,11 +76,6 @@ export const RegisterPage = () => {
       <Container size="sm">
         <div className="bg-[#17171a] p-8 sm:p-12 border border-white/10 shadow-2xl relative overflow-hidden">
           <div className="text-center mb-8">
-            <img
-              src="/logo.jpeg"
-              alt="PREM A TO Z INTERIOR DESIGN"
-              className="h-12 sm:h-14 w-auto max-w-[220px] object-contain rounded-sm mx-auto mb-4"
-            />
             <span className="text-[10px] uppercase tracking-[0.3em] text-[#c5a880] font-semibold block mb-2">
               Registration
             </span>

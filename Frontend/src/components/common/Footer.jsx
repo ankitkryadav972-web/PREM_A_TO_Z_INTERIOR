@@ -12,12 +12,13 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 pb-16 border-b border-white/5">
           {/* Brand Info */}
           <div className="lg:col-span-4 flex flex-col">
-            <Link to="/" className="inline-block mb-6 focus:outline-none group">
-              <img
-                src="/logo.jpeg"
-                alt="PREM A TO Z INTERIOR DESIGN"
-                className="h-12 sm:h-14 w-auto max-w-[220px] sm:max-w-[260px] object-contain rounded-sm transition-transform duration-300 group-hover:scale-105"
-              />
+            <Link to="/" className="inline-block mb-4 focus:outline-none">
+              <span className="font-editorial text-2xl font-bold tracking-wider text-white">
+                PREM A TO Z
+              </span>
+              <span className="block text-[10px] uppercase tracking-[0.3em] text-[#c5a880] -mt-1 font-medium">
+                Interior Design
+              </span>
             </Link>
 
             <p className="text-sm leading-relaxed text-stone-400 max-w-sm mb-6 font-light">

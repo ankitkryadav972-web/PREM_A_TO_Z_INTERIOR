@@ -162,12 +162,10 @@ export const AdminDashboardPage = () => {
           <div className="lg:col-span-3 bg-[#141417] border border-white/10 p-5 flex flex-col justify-between h-fit">
             <div>
               <div className="pb-4 mb-4 border-b border-white/10">
-                <img
-                  src="/logo.jpeg"
-                  alt="PREM A TO Z INTERIOR DESIGN"
-                  className="h-10 w-auto max-w-[180px] object-contain rounded-sm mb-2"
-                />
-                <span className="text-[9px] uppercase tracking-[0.25em] text-[#c5a880] font-medium block">
+                <span className="font-editorial text-xl font-normal text-white block">
+                  {businessInfo.name}
+                </span>
+                <span className="text-[10px] uppercase tracking-[0.25em] text-[#c5a880] font-medium">
                   Administrator Console
                 </span>
               </div>
